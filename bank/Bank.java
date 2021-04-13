@@ -38,12 +38,12 @@ public class Bank {
             Class.forName(JDBC_DRIVER);
             c = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
             System.out.println("Opened database successfully");
-            ResultSet resultats = null;
-            String requete = "CREATE DATABASE bank; CREATE TABLE account(id INTEGER PRIMARY KEY, )";
+
+            String query = "CREATE TABLE account(id INTEGER PRIMARY KEY, name VARCHAR(255), balance FLOAT, overdraft FLOAT, blocked BOOLEAN)";
             try{
                 Statement stmt = c.createStatement();
-                resultats = stmt.executeQuery(requete);
-                System.out.print(resultats);
+                stmt.executeUpdate(query);
+
             }catch (SQLException e){
                 System.out.print("erreur sql : " + e);
             }
