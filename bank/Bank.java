@@ -1,6 +1,7 @@
 package bank;
 
 
+import javax.swing.plaf.nimbus.State;
 import java.sql.*;
 import java.util.Arrays;
 
@@ -37,7 +38,15 @@ public class Bank {
             Class.forName(JDBC_DRIVER);
             c = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
             System.out.println("Opened database successfully");
-
+            ResultSet resultats = null;
+            String requete = "CREATE DATABASE bank; CREATE TABLE account(id INTEGER PRIMARY KEY, )";
+            try{
+                Statement stmt = c.createStatement();
+                resultats = stmt.executeQuery(requete);
+                System.out.print(resultats);
+            }catch (SQLException e){
+                System.out.print("erreur sql : " + e);
+            }
             // TODO Init DB
 
         } catch (Exception e) {
