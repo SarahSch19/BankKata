@@ -39,7 +39,7 @@ public class Bank {
             c = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
             System.out.println("Opened database successfully");
 
-            String query = "CREATE TABLE account(id INTEGER PRIMARY KEY, name VARCHAR(255), balance FLOAT, overdraft FLOAT, blocked BOOLEAN)";
+            String query = "CREATE TABLE accounts(id SERIAL PRIMARY KEY, name VARCHAR(255), balance FLOAT, overdraft FLOAT, blocked BOOLEAN);";
             try{
                 Statement stmt = c.createStatement();
                 stmt.executeUpdate(query);
@@ -77,11 +77,49 @@ public class Bank {
 
 
     public void createNewAccount(String name, int balance, int threshold) {
-        // TODO
+        try {
+            Class.forName(JDBC_DRIVER);
+            c = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+            System.out.println("Opened database successfully");
+
+            String query = "INSERT INTO accounts (name, balance, overdraft, blocked) VALUES ('" + name + "'," + Integer.toString(balance) + ',' + Integer.toString(balance) + ",false)";
+            System.out.print(query);
+            try{
+                Statement stmt = c.createStatement();
+                stmt.executeUpdate(query);
+
+            }catch (SQLException e){
+                System.out.print("erreur sql : " + e);
+            }
+
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
+        }
     }
 
     public String printAllAccounts() {
-        // TODO
+        ResultSet result;
+        try {
+            Class.forName(JDBC_DRIVER);
+            c = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+            System.out.println("Opened database successfully");
+
+            String query = "SELECT * FROM accounts";
+            System.out.print(query);
+            try{
+                Statement stmt = c.createStatement();
+                result = stmt.executeQuery(query);
+                result.next();
+                System.out.print(result.getString(1));
+            }catch (SQLException e){
+                System.out.print("erreur sql : " + e);
+            }
+
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
+        }
 
         return "";
     }
