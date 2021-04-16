@@ -34,14 +34,46 @@ public class Main extends Application {
 
             // Getting primary input
             userInput = s.nextLine();
-
+            String name;
+            int balance;
+            int threshold;
             // Processing user input
             switch (userInput) {
                 case "q":
                     endOfSession = true;
                     b.closeDb();
                     break;
-                // TODO
+                case "0":
+                    b.printAllAccounts();
+                    break;
+                case "1":
+                    System.out.print("Enter the account name : ");
+                    name = s.nextLine();
+
+                    System.out.print("Enter the account balance : ");
+                    balance = Integer.parseInt(s.nextLine());
+
+                    System.out.print("Enter the maximum threshold account : ");
+                    threshold = Integer.parseInt(s.nextLine());
+
+                    b.createNewAccount(name, balance, threshold);
+                    break;
+                case "2":
+                    System.out.print("Enter the account name : ");
+                    name = s.nextLine();
+
+                    System.out.print("Enter what you want to add to this account : ");
+                    balance = Integer.parseInt(s.nextLine());
+
+                    b.changeBalanceByName(name, balance);
+                    break;
+
+                case "3":
+                    System.out.print("Enter the account name that will be blocked : ");
+                    name = s.nextLine();
+
+                    b.blockAccount(name);
+                    break;
             }
         }
 
