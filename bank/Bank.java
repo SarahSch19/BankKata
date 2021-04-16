@@ -78,6 +78,8 @@ public class Bank {
 
 
     public void createNewAccount(String name, int balance, int threshold) {
+        if(threshold > 0)
+            return;
         try {
             Class.forName(JDBC_DRIVER);
             c = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);

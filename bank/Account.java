@@ -57,7 +57,8 @@ class Account {
     }
 
     public void setThreshold(int threshold) {
-        this.threshold = threshold;
+        if(threshold <= 0)
+            this.threshold = threshold;
     }
 
     public void setBlocked(Boolean blocked) {
