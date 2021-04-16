@@ -7,10 +7,17 @@ class Account {
     private int threshold;
     private Boolean blocked;
 
-    public Account(String name, int balance, int threshold) {
+    public Account(String name, int balance, int threshold ) {
         this.name = name;
         this.balance = balance;
         this.threshold = threshold;
+        this.blocked = false;
+    }
+    public Account(String name, int balance, int threshold, boolean blocked) {
+        this.name = name;
+        this.balance = balance;
+        this.threshold = threshold;
+        this.blocked = blocked;
     }
 
     // Methods

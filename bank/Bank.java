@@ -3,6 +3,7 @@ package bank;
 
 import javax.swing.plaf.nimbus.State;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Bank {
@@ -39,7 +40,7 @@ public class Bank {
             c = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
             System.out.println("Opened database successfully");
 
-            String query = "CREATE TABLE accounts(id SERIAL PRIMARY KEY, name VARCHAR(255), balance FLOAT, overdraft FLOAT, blocked BOOLEAN);";
+            String query = "CREATE TABLE accounts(name VARCHAR(255), balance FLOAT, overdraft FLOAT, blocked BOOLEAN DEFAULT 'false');";
             try{
                 Statement stmt = c.createStatement();
                 stmt.executeUpdate(query);
@@ -82,7 +83,7 @@ public class Bank {
             c = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
             System.out.println("Opened database successfully");
 
-            String query = "INSERT INTO accounts (name, balance, overdraft, blocked) VALUES ('" + name + "'," + Integer.toString(balance) + ',' + Integer.toString(balance) + ",false)";
+            String query = "INSERT INTO accounts (name, balance, overdraft, blocked) VALUES ('" + name + "'," + Integer.toString(balance) + ',' + Integer.toString(threshold) + ",'false')";
             System.out.print(query);
             try{
                 Statement stmt = c.createStatement();
@@ -100,18 +101,25 @@ public class Bank {
 
     public String printAllAccounts() {
         ResultSet result;
+        String accounts = "";
+
         try {
             Class.forName(JDBC_DRIVER);
             c = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
             System.out.println("Opened database successfully");
 
-            String query = "SELECT * FROM accounts";
+            String query = "SELECT name, balance, overdraft, blocked FROM accounts";
             System.out.print(query);
             try{
                 Statement stmt = c.createStatement();
                 result = stmt.executeQuery(query);
-                result.next();
-                System.out.print(result.getString(1));
+                while(result.next()) {
+                    String name = result.getString(1);
+                    int balance = result.getInt(2);
+                    int threshold = result.getInt(3);
+                    boolean blocked = result.getBoolean(4);
+                    accounts += new Account(name, balance, threshold, blocked).toString() + "\n";
+                }
             }catch (SQLException e){
                 System.out.print("erreur sql : " + e);
             }
@@ -121,7 +129,7 @@ public class Bank {
             System.exit(0);
         }
 
-        return "";
+        return accounts;
     }
 
     public void changeBalanceByName(String name, int balanceModifier) {
