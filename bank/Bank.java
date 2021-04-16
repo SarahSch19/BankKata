@@ -135,7 +135,25 @@ public class Bank {
     }
 
     public void changeBalanceByName(String name, int balanceModifier) {
-        // TODO
+
+        try {
+            Class.forName(JDBC_DRIVER);
+            c = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+            System.out.println("Opened database successfully");
+
+            String query = "UPDATE accounts SET balance = balance + " + balanceModifier + " WHERE name = '" + name + "'";
+            System.out.print(query);
+            try{
+                Statement stmt = c.createStatement();
+                stmt.executeQuery(query);
+            }catch (SQLException e){
+                System.out.print("erreur sql : " + e);
+            }
+
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
+        }
     }
 
     public void blockAccount(String name) {
