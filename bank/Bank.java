@@ -34,26 +34,48 @@ public class Bank {
         // TODO
     }
 
-    private void initDb() {
+    private ResultSet query(String sql) {
+        return query(sql, null);
+    }
+
+    private ResultSet query(String sql, ArrayList<Object> values ){
+        ResultSet result = null;
         try {
             Class.forName(JDBC_DRIVER);
             c = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
-            System.out.println("Opened database successfully");
-
-            String query = "CREATE TABLE accounts(name VARCHAR(255), balance FLOAT, overdraft FLOAT, blocked BOOLEAN DEFAULT 'false');";
             try{
-                Statement stmt = c.createStatement();
-                stmt.executeUpdate(query);
+                PreparedStatement stmt = c.prepareStatement(sql);
+                if(values != null)
+                    for (int i = 0; i < values.size(); i++) {
+                        switch (values.get(i).getClass().getSimpleName()) {
+                            case "String":
+                                stmt.setString(i + 1, values.get(i).toString());
+                                break;
+                            case "Integer":
+                                stmt.setInt(i + 1, (int) values.get(i));
+                                break;
+                            default:
+                                System.out.println("Error type");
+                        }
+                    }
+                try{
+                    result = stmt.executeQuery();
+                } catch (SQLException e){ }
 
             }catch (SQLException e){
                 System.out.print("erreur sql : " + e);
             }
-            // TODO Init DB
 
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
             System.exit(0);
         }
+
+        return result;
+    }
+
+    private void initDb() {
+        query("CREATE TABLE accounts(name VARCHAR(255), balance FLOAT, overdraft FLOAT, blocked BOOLEAN DEFAULT 'false')");
     }
 
     public void closeDb() {
@@ -80,101 +102,49 @@ public class Bank {
     public void createNewAccount(String name, int balance, int threshold) {
         if(threshold > 0)
             return;
-        try {
-            Class.forName(JDBC_DRIVER);
-            c = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
-            System.out.println("Opened database successfully");
 
-            String query = "INSERT INTO accounts (name, balance, overdraft, blocked) VALUES ('" + name + "'," + Integer.toString(balance) + ',' + Integer.toString(threshold) + ",'false')";
-            System.out.print(query);
-            try{
-                Statement stmt = c.createStatement();
-                stmt.executeUpdate(query);
+        ArrayList<Object> values = new ArrayList<Object>();
+        values.add(name);
+        values.add(balance);
+        values.add(threshold);
 
-            }catch (SQLException e){
-                System.out.print("erreur sql : " + e);
-            }
+        query("INSERT INTO accounts (name, balance, overdraft, blocked) VALUES (?,?,?,'false')", values);
 
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-            System.exit(0);
-        }
     }
 
     public String printAllAccounts() {
         ResultSet result;
         String accounts = "";
 
+        result = query("SELECT name, balance, overdraft, blocked FROM accounts");
         try {
-            Class.forName(JDBC_DRIVER);
-            c = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
-            System.out.println("Opened database successfully");
-
-            String query = "SELECT name, balance, overdraft, blocked FROM accounts";
-            System.out.print(query);
-            try{
-                Statement stmt = c.createStatement();
-                result = stmt.executeQuery(query);
-                while(result.next()) {
-                    String name = result.getString(1);
-                    int balance = result.getInt(2);
-                    int threshold = result.getInt(3);
-                    boolean blocked = result.getBoolean(4);
-                    accounts += new Account(name, balance, threshold, blocked).toString() + "\n";
-                }
-            }catch (SQLException e){
-                System.out.print("erreur sql : " + e);
+            while(result.next()) {
+                String name = result.getString(1);
+                int balance = result.getInt(2);
+                int threshold = result.getInt(3);
+                boolean blocked = result.getBoolean(4);
+                accounts += new Account(name, balance, threshold, blocked).toString() + "\n";
             }
-
         } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-            System.exit(0);
+            System.out.println(e.toString());
         }
-
         return accounts;
     }
 
     public void changeBalanceByName(String name, int balanceModifier) {
+        ArrayList<Object> values = new ArrayList<Object>();
+        values.add(balanceModifier);
+        values.add(name);
+        values.add(balanceModifier);
 
-        try {
-            Class.forName(JDBC_DRIVER);
-            c = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
-            System.out.println("Opened database successfully");
+        query("UPDATE accounts SET balance = balance + ? WHERE name = ? AND blocked = 'false' AND balance + ? >= overdraft", values);
 
-            String query = "UPDATE accounts SET balance = balance + " + balanceModifier + " WHERE name = '" + name + "' AND blocked = 'false' AND balance +" + balanceModifier + " >= overdraft";
-            System.out.print(query);
-            try{
-                Statement stmt = c.createStatement();
-                stmt.executeQuery(query);
-            }catch (SQLException e){
-                System.out.print("erreur sql : " + e);
-            }
-
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-            System.exit(0);
-        }
     }
 
     public void blockAccount(String name) {
-        try {
-            Class.forName(JDBC_DRIVER);
-            c = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
-            System.out.println("Opened database successfully");
-
-            String query = "UPDATE accounts SET blocked = 'true' WHERE name = '" + name + "'";
-            System.out.print(query);
-            try{
-                Statement stmt = c.createStatement();
-                stmt.executeQuery(query);
-            }catch (SQLException e){
-                System.out.print("erreur sql : " + e);
-            }
-
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-            System.exit(0);
-        }
+        ArrayList<Object> values = new ArrayList<Object>();
+        values.add(name);
+        query("UPDATE accounts SET blocked = 'true' WHERE name = ?", values);
     }
 
     // For testing purpose
