@@ -141,7 +141,7 @@ public class Bank {
             c = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
             System.out.println("Opened database successfully");
 
-            String query = "UPDATE accounts SET balance = balance + " + balanceModifier + " WHERE name = '" + name + "'";
+            String query = "UPDATE accounts SET balance = balance + " + balanceModifier + " WHERE name = '" + name + "' AND blocked = 'false' AND balance +" + balanceModifier + " >= overdraft";
             System.out.print(query);
             try{
                 Statement stmt = c.createStatement();
@@ -157,7 +157,24 @@ public class Bank {
     }
 
     public void blockAccount(String name) {
-        // TODO
+        try {
+            Class.forName(JDBC_DRIVER);
+            c = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+            System.out.println("Opened database successfully");
+
+            String query = "UPDATE accounts SET blocked = 'true' WHERE name = '" + name + "'";
+            System.out.print(query);
+            try{
+                Statement stmt = c.createStatement();
+                stmt.executeQuery(query);
+            }catch (SQLException e){
+                System.out.print("erreur sql : " + e);
+            }
+
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
+        }
     }
 
     // For testing purpose
