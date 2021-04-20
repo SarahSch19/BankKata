@@ -86,7 +86,7 @@ public class Bank {
         }
     }
 
-    void dropAllTables() {
+    public void dropAllTables() {
         try (Statement s = c.createStatement()) {
             s.executeUpdate(
                        "DROP SCHEMA public CASCADE;" +

@@ -41,6 +41,7 @@ public class Main extends Application {
             switch (userInput) {
                 case "q":
                     endOfSession = true;
+                    b.dropAllTables();
                     b.closeDb();
                     break;
                 case "0":
