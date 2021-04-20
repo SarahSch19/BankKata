@@ -44,7 +44,7 @@ public class Main extends Application {
                     b.closeDb();
                     break;
                 case "0":
-                    b.printAllAccounts();
+                    System.out.print(b.printAllAccounts());
                     break;
                 case "1":
                     System.out.print("Enter the account name : ");
