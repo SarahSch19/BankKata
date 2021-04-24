@@ -51,17 +51,37 @@ public class Main extends Application {
                     System.out.print("Enter the account name : ");
                     name = s.nextLine();
 
+                    if(name.length() == 0) {
+                        System.out.print("Wrong entry");
+                        break;
+                    }
+
                     System.out.print("Enter the account balance : ");
                     balance = Integer.parseInt(s.nextLine());
 
+                    if(balance < 0){
+                        System.out.print("Why you want to open an account whith negative balance ???");
+                        break;
+                    }
+
                     System.out.print("Enter the maximum threshold account : ");
                     threshold = Integer.parseInt(s.nextLine());
+
+                    if(threshold > 0){
+                        System.out.print("NO !!!! You can't have a positif threshold");
+                        break;
+                    }
 
                     b.createNewAccount(name, balance, threshold);
                     break;
                 case "2":
                     System.out.print("Enter the account name : ");
                     name = s.nextLine();
+
+                    if(name.length() == 0) {
+                        System.out.print("Wrong entry");
+                        break;
+                    }
 
                     System.out.print("Enter what you want to add to this account : ");
                     balance = Integer.parseInt(s.nextLine());
@@ -72,6 +92,11 @@ public class Main extends Application {
                 case "3":
                     System.out.print("Enter the account name that will be blocked : ");
                     name = s.nextLine();
+
+                    if(name.length() == 0) {
+                        System.out.print("Wrong entry");
+                        break;
+                    }
 
                     b.blockAccount(name);
                     break;
